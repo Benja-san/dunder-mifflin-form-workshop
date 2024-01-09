@@ -19,7 +19,7 @@
                 <?php endforeach; ?>
             </ul>
             <p>
-                <a href="form.html">Retour au formulaire</a>
+                <a href="form.php">Retour au formulaire</a>
             </p>
         </div>
     </main>

@@ -1,13 +1,34 @@
 <?php
-$errors = [];
+    require_once("sales.php");
 
-// TODO 3 - Get the data from the form and check for errors
+    $errors = [];
 
+    // $sanitizedData = array_map('htmlEntities', $_POST);
+    // $cleanData = array_map('trim', $sanitizedData);
+    $cleanData = [];
+    foreach($_POST as $key => $value) {
+        $cleanData[$key] = trim(htmlentities($value));
+        if (empty($cleanData[$key])) {
+            $errors[$key] = "Le champ $key est obligatoire";
+        }
+        if(isset($cleanData[$key]) && $key === "email" && !filter_var($cleanData[$key], FILTER_VALIDATE_EMAIL)) {
+            $errors[$key] = "Le champ $key doit être un email valide";
+        }
+        if(isset($cleanData[$key]) && $key === "contactMessage" && strlen($cleanData[$key]) < 30) {
+            $errors[$key] = "Le champ $key doit comporter plus de 30 characters";
+        }
+        if($key === "salesman" && !in_array( $cleanData[$key], $sales)){
+            $errors[$key] = "Séléctionnez un vendeur de notre équipe";
+        }
+    };
 
-if (!empty($errors)) {
-    require 'error.php';
-    die();
-}
+    if (!empty($errors)) {
+        require 'error.php';
+        die();
+    }
+
+    $salesPicture = strtolower(explode(" ", $cleanData["salesman"])[0]);
+
 ?>
 
 <!DOCTYPE html>
@@ -30,24 +51,17 @@ if (!empty($errors)) {
 
     <main>
         <div class="summary">
-            <!-- BONUS -->
             <p>
-                <img src="images/placeholder.png" alt="">
+                <img src="images/<?php echo $salesPicture ?>.webp" alt="<?php echo $cleanData["salesman"] ?>">
                 <span>Votre vendeur</span>
             </p>
             
-
-            <!-- TODO 2 - Replace those placeholders by the values sent from the form -->
             <ul>
-                <li>Votre entreprise : <span>Dunder Mifflin</span></li>
-                <li>Votre nom : <span>Mickael Scott</span></li>
-                <li>Votre email : <span>mickael.scott@dundermifflin.com</span></li>
+                <li>Votre entreprise : <span><?php echo $cleanData["companyName"] ?></span></li>
+                <li>Votre nom : <span><?php echo $cleanData["lastname"] ?></span></li>
+                <li>Votre email : <span><?php echo $cleanData["email"] ?></span></li>
                 <li>Votre message :
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Provident facere, tempora possimus aspernatur excepturi
-                        incidunt dolores illo dicta similique harum mollitia enim
-                        voluptates delectus? Repellendus inventore molestiae a
-                        accusamus deleniti?
+                    <p><?php echo $cleanData["contactMessage"] ?>
                     </p>
                 </li>
             </ul>
